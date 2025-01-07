@@ -1,0 +1,84 @@
+spring:
+  profiles:
+    active: campaignsSitio # Activar el perfil campaignsSitio
+  
+  datasource:
+    # Base de datos bonos recompra
+    db1:
+      url: jdbc:postgresql://localhost:5432/bonos_recompra_comfandi_db
+      username: postgres
+      password: D3v3l0pm3nt
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 20 # Tamaño máximo de conexiones en el pool
+        minimum-idle: 5        # Conexiones mínimas inactivas
+        idle-timeout: 30000    # Tiempo de espera para conexiones inactivas
+        max-lifetime: 600000   # Duración máxima de las conexiones
+        connection-timeout: 30000 # Tiempo máximo para obtener una conexión
+        validation-timeout: 3000  # Tiempo para validar una conexión
+        connection-test-query: SELECT 1  # Consulta para probar conexiones
+        pool-name: db1-pool
+
+    # Base de datos clientes Comfandi
+    db2:
+      url: jdbc:postgresql://localhost:5432/Clientes_Confamdi
+      username: postgres
+      password: D3v3l0pm3nt
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 20 # Tamaño máximo de conexiones en el pool
+        minimum-idle: 5        # Conexiones mínimas inactivas
+        idle-timeout: 30000    # Tiempo de espera para conexiones inactivas
+        max-lifetime: 600000   # Duración máxima de las conexiones
+        connection-timeout: 30000 # Tiempo máximo para obtener una conexión
+        validation-timeout: 3000  # Tiempo para validar una conexión
+        connection-test-query: SELECT 1  # Consulta para probar conexiones
+        pool-name: db2-pool
+  
+  batch:
+    job:
+      enabled: true
+    jdbc:
+      initialize-schema: always # Esto inicializa las tablas necesarias en la base de datos
+      datasource: db1 # Configura el datasource para Spring Batch, si usas db1
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+        show-sql: true # Muestra las consultas SQL ejecutadas en la consola (opcional)
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+# Configuración adicional para los EntityManagerFactory y TransactionManager
+# Para db1
+db1:
+  entity-manager-factory:
+    persistence-unit-name: db1
+    type: jakarta.persistence.EntityManagerFactory
+  transaction-manager:
+    type: org.springframework.orm.jpa.JpaTransactionManager
+
+# Para db2
+db2:
+  entity-manager-factory:
+    persistence-unit-name: db2
+    type: jakarta.persistence.EntityManagerFactory
+  transaction-manager:
+    type: org.springframework.orm.jpa.JpaTransactionManager
+
+# Logs
+logging:
+  level:
+    org.springframework.batch.core: DEBUG # Ajusta el nivel de log para la ejecución de Spring Batch
+    org.springframework: INFO # Configura el nivel de log para Spring
+    com.mycompany.batch: DEBUG # Ajuste opcional para tu paquete
+
+# feign
+feign:
+  client:
+    config:
+      authService:
+        connectTimeout: 5000
+        readTimeout: 5000
